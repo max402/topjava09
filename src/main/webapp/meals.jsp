@@ -20,7 +20,7 @@
 <%--<jsp:useBean id="meals" scope="request" type="java.util.List"/>--%>
 <c:forEach var="m" items="${meals}">
     <tr style="color: ${m.exceed?"red":"green"};">
-        <%--<td><c:out value="${m.getDateTime().toLocalDate()}:${m.getDateTime().toLocalTime()}"/></td>--%>
+        <%--<td><c:out value="${m.getDateTime().toLocalDate()} ${m.getDateTime().toLocalTime()}"/></td>--%>
         <td>${f:formatLocalDateTime(m.dateTime, 'dd.MM.yyyy HH:mm:SS')}</td>
         <td><c:out value="${m.description}"/></td>
         <td><c:out value="${m.calories}"/></td>

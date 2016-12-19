@@ -8,8 +8,6 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.javawebinar.topjava.repository.InMemoryMealRepository.MEALS;
-
 /**
  * GKislin
  * 31.05.2015.
@@ -18,15 +16,15 @@ public class MealsUtil {
 
 
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//
+//        List<MealWithExceed> mealsWithExceeded = getFiltered(getWithExceeded(MEALS, 2000), LocalTime.of(7, 0), LocalTime.of(12, 0));
+//        mealsWithExceeded.forEach(System.out::println);
+//
+//        System.out.println(getFilteredWithExceededByCycle(MEALS, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
+//    }
 
-        List<MealWithExceed> mealsWithExceeded = getFilteredWithExceeded(getMealsWithExceeded(MEALS, 2000), LocalTime.of(7, 0), LocalTime.of(12, 0));
-        mealsWithExceeded.forEach(System.out::println);
-
-        System.out.println(getFilteredWithExceededByCycle(MEALS, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
-    }
-
-    public static List<MealWithExceed> getMealsWithExceeded(List<Meal> meals, int caloriesPerDay) {
+    public static List<MealWithExceed> getWithExceeded(Collection<Meal> meals, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories)));
 
@@ -36,7 +34,7 @@ public class MealsUtil {
     }
 
 
-    public static List<MealWithExceed> getFilteredWithExceeded(List<MealWithExceed> meals, LocalTime startTime, LocalTime endTime) {
+    public static List<MealWithExceed> getFiltered(List<MealWithExceed> meals, LocalTime startTime, LocalTime endTime) {
 
         return meals.stream()
                 .filter(meal -> TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTime, endTime))

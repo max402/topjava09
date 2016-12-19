@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  */
 public class MealWithExceed {
 
-    private final int id;
+    protected Integer id;
 
     private final LocalDateTime dateTime;
 

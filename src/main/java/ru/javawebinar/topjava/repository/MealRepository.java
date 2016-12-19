@@ -4,6 +4,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealWithExceed;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -11,13 +12,11 @@ import java.util.List;
  */
 public interface MealRepository {
 
-    public void add(LocalDateTime dateTime, String description, int calories);
-
-    public void update(int id, LocalDateTime dateTime, String description, int calories);
+    public void save(Meal meal);
 
     public void remove(int id);
 
-    public List<MealWithExceed> getAll();
+    public Collection<Meal> getAll();
 
-    public Meal findById(int id);
+    public Meal get(int id);
 }
