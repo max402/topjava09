@@ -37,26 +37,28 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
             if(!userMeal.containsKey(meal.getId())) return null;
         }
         userMeal.put(meal.getId(), meal);
+        repository.put(userId, userMeal);
         return meal;
     }
 
     @Override
     public boolean delete(int userId, int id) {
-        Map<Integer, Meal> userMeal = repository.get(userId);
+        Map<Integer, Meal> userMeal = repository.getOrDefault(userId, new ConcurrentHashMap<Integer, Meal>());
         if(!userMeal.containsKey(id)) return false;
         userMeal.remove(id);
+        repository.put(userId, userMeal);
         return true;
     }
 
     @Override
     public Meal get(int userId, int id) {
-        Map<Integer, Meal> userMeal = repository.get(userId);
+        Map<Integer, Meal> userMeal = repository.getOrDefault(userId, new ConcurrentHashMap<Integer, Meal>());
         return userMeal.get(id);
     }
 
     @Override
     public List<Meal> getAll(int userId, LocalDate startDate, LocalDate endDate) {
-        Map<Integer, Meal> userMeal = repository.get(userId);
+        Map<Integer, Meal> userMeal = repository.getOrDefault(userId, new ConcurrentHashMap<Integer, Meal>());
         Comparator<Meal> mealComparator = (m1, m2) -> m1.getDateTime().compareTo(m2.getDateTime());
         return userMeal.values().stream().filter(m-> DateTimeUtil.isBetweenDate(m.getDateTime().toLocalDate(), startDate, endDate)).sorted(mealComparator).collect(Collectors.toList());
     }
