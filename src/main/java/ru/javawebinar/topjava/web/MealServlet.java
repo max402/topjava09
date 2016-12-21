@@ -30,13 +30,26 @@ import java.util.Objects;
 public class MealServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(MealServlet.class);
 
-    private ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
-    private MealRestController mealRestController = appCtx.getBean(MealRestController.class);
-
     private LocalDate startDate = LocalDate.MIN;
     private LocalDate endDate = LocalDate.MAX;
     private LocalTime startTime = LocalTime.MIN;
     private LocalTime endTime = LocalTime.MAX;
+
+    private ConfigurableApplicationContext appCtx;
+    private MealRestController mealRestController;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
+        mealRestController = appCtx.getBean(MealRestController.class);
+    }
+
+    @Override
+    public void destroy() {
+        appCtx.close();
+        super.destroy();
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

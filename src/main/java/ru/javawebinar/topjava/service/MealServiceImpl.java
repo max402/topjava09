@@ -9,6 +9,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
+
 /**
  * GKislin
  * 06.03.2015.
@@ -20,22 +22,25 @@ public class MealServiceImpl implements MealService {
     private MealRepository repository;
 
     @Override
-    public Meal save(int userId, Meal meal) throws NotFoundException {
-        Meal savedMeal = repository.save(userId, meal);
-        if(savedMeal==null) throw new NotFoundException("meal not found with id:"+meal.getId());
-        return savedMeal;
+    public Meal save(int userId, Meal meal) {
+//        Meal savedMeal = repository.save(userId, meal);
+//        if(savedMeal==null) throw new NotFoundException("meal not found with id:"+meal.getId());
+//        return savedMeal;
+        return checkNotFoundWithId(repository.save(userId, meal), meal.getId());
     }
 
     @Override
-    public void delete(int userId, int id) throws NotFoundException {
-        if(!repository.delete(userId, id)) throw new NotFoundException("meal not found with id:"+id);
+    public void delete(int userId, int id) {
+        //if(!repository.delete(userId, id)) throw new NotFoundException("meal not found with id:"+id);
+        checkNotFoundWithId(repository.delete(userId, id), id);
     }
 
     @Override
-    public Meal get(int userId, int id) throws NotFoundException {
-        Meal meal = repository.get(userId, id);
-        if(meal==null) throw new NotFoundException("meal not found with id:"+id);
-        return meal;
+    public Meal get(int userId, int id) {
+//        Meal meal = repository.get(userId, id);
+//        if(meal==null) throw new NotFoundException("meal not found with id:"+id);
+//        return meal;
+        return checkNotFoundWithId(repository.get(userId, id), id);
     }
 
     @Override
@@ -44,8 +49,14 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public void update(int userId, Meal meal) throws NotFoundException {
-        Meal savedMeal = repository.save(userId, meal);
-        if(savedMeal==null) throw new NotFoundException("meal not found with id:"+meal.getId());
+    public List<Meal> getAll(int userId) {
+        return repository.getAll(userId);
+    }
+
+    @Override
+    public void update(int userId, Meal meal) {
+//        Meal savedMeal = repository.save(userId, meal);
+//        if(savedMeal==null) throw new NotFoundException("meal not found with id:"+meal.getId());
+        checkNotFoundWithId(repository.save(userId, meal), meal.getId());
     }
 }

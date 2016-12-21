@@ -13,7 +13,6 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * GKislin
@@ -28,7 +27,7 @@ public class MealRestController {
 
     public Collection<Meal> getAll() {
         LOG.info("getAll");
-        return service.getAll(AuthorizedUser.id(), LocalDate.MIN, LocalDate.MAX);
+        return service.getAll(AuthorizedUser.id());
     }
 
     public Collection<MealWithExceed> getFilteredWithExceded(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
