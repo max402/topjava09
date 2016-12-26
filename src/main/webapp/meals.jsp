@@ -18,7 +18,7 @@
 <body>
 
 
-<form method="post" action="meals">
+<form method="post" action="meals?action=filter">
     От даты:
     <input type="date" value="${startDate}" name="startDate">
     До даты:
@@ -27,7 +27,6 @@
     <input type="time" value="${startTime}" name="startTime">
     До времени:
     <input type="time" value="${endTime}" name="endTime">
-    <input type="hidden" name=filter value="filter">
     <button type="submit">Отфильтровать</button>
 </form>
 

@@ -30,12 +30,13 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal save(int userId, Meal meal) {
-        Map<Integer, Meal> userMeal = repository.computeIfAbsent(userId, key -> new ConcurrentHashMap<>());
+        Map<Integer, Meal> userMeal = repository.computeIfAbsent(userId, ConcurrentHashMap::new);
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-        } else {
-            if(!userMeal.containsKey(meal.getId())) return null;
         }
+        else
+            if(!userMeal.containsKey(meal.getId())) return null;
+
         userMeal.put(meal.getId(), meal);
         //repository.put(userId, userMeal);
         return meal;
@@ -43,17 +44,22 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
 
     @Override
     public boolean delete(int userId, int id) {
-        Map<Integer, Meal> userMeal = repository.getOrDefault(userId, new ConcurrentHashMap<>());
-        if(!userMeal.containsKey(id)) return false;
-        userMeal.remove(id);
-        //repository.put(userId, userMeal); понял что эта строка лишняя
-        return true;
+//        Map<Integer, Meal> userMeal = repository.getOrDefault(userId, new ConcurrentHashMap<>());
+//        if(!userMeal.containsKey(id)) return false;
+//        userMeal.remove(id);
+//        //repository.put(userId, userMeal); понял что эта строка лишняя
+//        return true;
+        Map<Integer, Meal> userMeal = repository.get(userId);
+        return userMeal.remove(id)== null;
     }
 
     @Override
     public Meal get(int userId, int id) {
-        Map<Integer, Meal> userMeal = repository.getOrDefault(userId, new ConcurrentHashMap<>());
-        return userMeal.get(id);
+//        Map<Integer, Meal> userMeal = repository.getOrDefault(userId, new ConcurrentHashMap<>());
+//        return userMeal.get(id);
+
+        Map<Integer, Meal> userMeal = repository.get(userId);
+        return userMeal == null ? null : userMeal.get(id);
     }
 
     @Override

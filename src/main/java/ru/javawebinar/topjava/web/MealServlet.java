@@ -30,11 +30,6 @@ import java.util.Objects;
 public class MealServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(MealServlet.class);
 
-    private LocalDate startDate = LocalDate.MIN;
-    private LocalDate endDate = LocalDate.MAX;
-    private LocalTime startTime = LocalTime.MIN;
-    private LocalTime endTime = LocalTime.MAX;
-
     private ConfigurableApplicationContext appCtx;
     private MealRestController mealRestController;
 
@@ -55,18 +50,21 @@ public class MealServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
 
-        if(request.getParameter("filter")!=null) {
+        if(request.getParameter("action")!=null) {
             String strStartDate = request.getParameter("startDate");
-            startDate = strStartDate == "" ? LocalDate.MIN : LocalDate.parse(strStartDate);
+            LocalDate startDate = "".equals(strStartDate) || strStartDate==null ? LocalDate.MIN : LocalDate.parse(strStartDate);
 
             String strEndDate = request.getParameter("endDate");
-            endDate = strEndDate == "" ? LocalDate.MAX : LocalDate.parse(strEndDate);
+            LocalDate endDate = "".equals(strEndDate) || strEndDate==null ? LocalDate.MAX : LocalDate.parse(strEndDate);
 
             String strStartTime = request.getParameter("startTime");
-            startTime = strStartTime == "" ? LocalTime.MIN : LocalTime.parse(strStartTime);
+            LocalTime startTime = "".equals(strStartTime) || strStartTime==null ? LocalTime.MIN : LocalTime.parse(strStartTime);
 
             String strEndTime = request.getParameter("endTime");
-            endTime = strEndDate == "" ? LocalTime.MAX : LocalTime.parse(strEndTime);
+            LocalTime endTime = "".equals(strEndTime) || strEndTime==null ? LocalTime.MAX : LocalTime.parse(strEndTime);
+
+            request.setAttribute("meals", mealRestController.getFilteredWithExceded(startDate, startTime, endDate, endTime));
+            request.getRequestDispatcher("meals.jsp").forward(request, response);
         } else {
             String id = request.getParameter("id");
             Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
@@ -78,9 +76,8 @@ public class MealServlet extends HttpServlet {
             //repository.save(AuthorizedUser.id(), meal);
             if (meal.isNew()) mealRestController.create(meal);
             else mealRestController.update(meal);
+            response.sendRedirect("meals");
         }
-
-        response.sendRedirect("meals");
 
     }
 
@@ -88,16 +85,11 @@ public class MealServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
-        request.setAttribute("startDate", startDate);
-        request.setAttribute("startTime", startTime);
-        request.setAttribute("endDate", endDate);
-        request.setAttribute("endTime", endTime);
-
         if (action == null) {
             LOG.info("getAll");
             request.setAttribute("meals",
-                    //MealsUtil.getWithExceeded(repository.getAll(AuthorizedUser.id(), LocalDate.MIN, LocalDate.MAX), MealsUtil.DEFAULT_CALORIES_PER_DAY));
-                    mealRestController.getFilteredWithExceded(startDate, startTime, endDate, endTime));
+                    MealsUtil.getWithExceeded(mealRestController.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
+                    //mealRestController.getFilteredWithExceded(startDate, startTime, endDate, endTime));
             request.getRequestDispatcher("/meals.jsp").forward(request, response);
 
         } else if ("delete".equals(action)) {
