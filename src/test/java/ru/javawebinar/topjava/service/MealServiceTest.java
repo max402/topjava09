@@ -14,10 +14,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -46,7 +43,7 @@ public class MealServiceTest {
         Meal newMeal = new Meal(null, LocalDateTime.of(2015,5,1,10,0), "Завтрак", 500);
         Meal created = service.save(newMeal, USER_ID);
         newMeal.setId(created.getId());
-        List<Meal> m = mealsMap.get(USER_ID);
+        List<Meal> m = new ArrayList<>(mealsMap.get(USER_ID));
         m.add(newMeal);
         MATCHER.assertCollectionEquals(m, service.getAll(USER_ID));
     }
@@ -65,10 +62,10 @@ public class MealServiceTest {
 
     @Test
     public void getBetweenDateTimes() throws Exception {
-        LocalDateTime startTime = LocalDateTime.of(2015, Month.MAY,1,0,0);
-        LocalDateTime endTime = LocalDateTime.of(2015, Month.MAY, 31,0,0);
-        List<Meal> expected = mealsMap.get(USER_ID).stream().filter(meal -> DateTimeUtil.isBetween(meal.getDateTime(), startTime, endTime)).collect(Collectors.toList());
-        MATCHER.assertCollectionEquals(expected, service.getBetweenDateTimes(startTime, endTime, USER_ID));
+        LocalDateTime start = LocalDateTime.of(2015, Month.MAY,1,0,0);
+        LocalDateTime end = LocalDateTime.of(2015, Month.MAY, 31,0,0);
+        List<Meal> expected = mealsMap.get(USER_ID).stream().filter(meal -> DateTimeUtil.isBetween(meal.getDateTime(), start, end)).collect(Collectors.toList());
+        MATCHER.assertCollectionEquals(expected, service.getBetweenDateTimes(start, end, USER_ID));
     }
 
     @Test
@@ -102,7 +99,5 @@ public class MealServiceTest {
         Meal updated = new Meal(mealsMap.get(USER_ID).get(1));
         service.update(updated, ADMIN_ID);
     }
-
-
 
 }
