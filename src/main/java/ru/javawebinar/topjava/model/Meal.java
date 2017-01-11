@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.model;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,6 +24,7 @@ public class Meal extends BaseEntity {
     public static final String ALL_SORTED = "Meal.getAllSorted";
     public static final String ALL_BETWEEN = "Meal.getAllBetween";
 
+    @NotNull
     @Column(name = "date_time", columnDefinition = "timestamp default now()")
     private LocalDateTime dateTime;
 
@@ -32,6 +34,7 @@ public class Meal extends BaseEntity {
     @Column(name = "calories", nullable = false)
     private int calories;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

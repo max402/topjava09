@@ -69,8 +69,9 @@ public class MealServiceTest {
         MATCHER.assertCollectionEquals(Arrays.asList(MEAL6, MEAL5, MEAL4, MEAL3, MEAL2), service.getAll(USER_ID));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void testDeleteNotFound() throws Exception {
+        exception.expect(NotFoundException.class);
         service.delete(MEAL1_ID, 1);
     }
 
