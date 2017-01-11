@@ -30,6 +30,8 @@ public class JpaMealRepositoryImpl implements MealRepository {
     @Transactional
     public Meal save(Meal meal, int userId) {
 
+        if(!getBetween(meal.getDateTime(), meal.getDateTime(), userId).isEmpty()) return null;
+
         User ref = em.getReference(User.class, userId);
         meal.setUser(ref);
 
@@ -37,9 +39,9 @@ public class JpaMealRepositoryImpl implements MealRepository {
             em.persist(meal);
             return meal;
         } else {
-            try {
+            //try {
                 return  get(meal.getId(), userId) != null ? em.merge(meal) : null;
-            } catch (NoResultException e) { throw new NotFoundException("NoResultException"); }
+            //} catch (NoResultException e) { throw new NotFoundException("NoResultException"); }
         }
     }
 
