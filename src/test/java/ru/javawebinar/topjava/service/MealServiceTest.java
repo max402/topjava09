@@ -1,7 +1,11 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -9,6 +13,7 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.web.MealServlet;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -25,6 +30,35 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    private static final Logger LOG = LoggerFactory.getLogger(MealServiceTest.class);
+
+    private static String logSummary;
+
+    @Rule
+    public TestName testName = new TestName();
+
+    private long start;
+
+    @Before
+    public void start() {
+        start = System.currentTimeMillis();
+    }
+
+    @After
+    public void end() {
+        String msg = "Test " + testName.getMethodName() + " took " + (System.currentTimeMillis() - start) + " ms";
+        LOG.warn(msg);
+        logSummary = logSummary + "\n" + msg;
+    }
+
+    @AfterClass
+    public static void endClass() {
+        LOG.warn(logSummary);
+    }
 
     @Autowired
     private MealService service;
@@ -53,8 +87,9 @@ public class MealServiceTest {
         MATCHER.assertEquals(ADMIN_MEAL1, actual);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void testGetNotFound() throws Exception {
+        exception.expect(NotFoundException.class);
         service.get(MEAL1_ID, ADMIN_ID);
     }
 
@@ -65,8 +100,9 @@ public class MealServiceTest {
         MATCHER.assertEquals(updated, service.get(MEAL1_ID, USER_ID));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void testUpdateNotFound() throws Exception {
+        exception.expect(NotFoundException.class);
         service.update(MEAL1, ADMIN_ID);
     }
 
