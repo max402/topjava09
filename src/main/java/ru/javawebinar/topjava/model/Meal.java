@@ -26,9 +26,11 @@ public class Meal extends BaseEntity {
     @Column(name = "date_time", columnDefinition = "timestamp default now()")
     private LocalDateTime dateTime;
 
+    @NotNull
     @Column(name = "description", nullable = false)
     private String description;
 
+    @NotNull
     @Column(name = "calories", nullable = false)
     private int calories;
 

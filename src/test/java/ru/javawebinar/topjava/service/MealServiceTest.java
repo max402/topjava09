@@ -2,7 +2,9 @@ package ru.javawebinar.topjava.service;
 
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.Stopwatch;
 import org.junit.rules.TestName;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +15,11 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
-import ru.javawebinar.topjava.web.MealServlet;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -31,33 +33,44 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
+
+    private static StringBuffer logSummary = new StringBuffer("\n");
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private static final Logger LOG = LoggerFactory.getLogger(MealServiceTest.class);
-
-    private static String logSummary;
+    @Rule
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            String testName = description.getMethodName();
+            String msg = String.format("Test %s, spent %d ms.", testName, TimeUnit.NANOSECONDS.toMillis(nanos));
+            logger.info(msg);
+            logSummary.append(msg+"\n");
+        }
+    };
 
     @Rule
     public TestName testName = new TestName();
 
     private long start;
 
-    @Before
-    public void start() {
-        start = System.currentTimeMillis();
-    }
-
-    @After
-    public void end() {
-        String msg = "Test " + testName.getMethodName() + " took " + (System.currentTimeMillis() - start) + " ms";
-        LOG.warn(msg);
-        logSummary = logSummary + "\n" + msg;
-    }
+//    @Before
+//    public void start() {
+//        start = System.currentTimeMillis();
+//    }
+//
+//    @After
+//    public void end() {
+//        String msg = "Test " + testName.getMethodName() + " took " + (System.currentTimeMillis() - start) + " ms";
+//        logger.warn(msg);
+//        logSummary = logSummary + "\n" + msg;
+//    }
 
     @AfterClass
     public static void endClass() {
-        LOG.warn(logSummary);
+        logger.info(logSummary.toString());
     }
 
     @Autowired
