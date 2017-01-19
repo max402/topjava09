@@ -54,8 +54,12 @@ public class JdbcMealRepositoryImpl implements MealRepository {
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
-                .addValue("date_time", dbSpecificFormat(meal.getDateTime()))
                 .addValue("user_id", userId);
+
+        if(Arrays.asList(this.environment.getActiveProfiles()).contains(Profiles.HSQLDB))
+            map.addValue("date_time", dbSpecificFormat(meal.getDateTime()));
+        else
+            map.addValue("date_time", meal.getDateTime());
 
         if (meal.isNew()) {
             Number newId = insertMeal.executeAndReturnKey(map);
@@ -92,16 +96,15 @@ public class JdbcMealRepositoryImpl implements MealRepository {
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return jdbcTemplate.query(
-                "SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, dbSpecificFormat(startDate), dbSpecificFormat(endDate));
+        String query = "SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC";
+        if(Arrays.asList(this.environment.getActiveProfiles()).contains(Profiles.HSQLDB))
+            return jdbcTemplate.query(query, ROW_MAPPER, userId, dbSpecificFormat(startDate), dbSpecificFormat(endDate));
+        else
+            return jdbcTemplate.query(query, ROW_MAPPER, userId, startDate, endDate);
     }
 
     private String dbSpecificFormat(LocalDateTime dateTime) {
-        if(Arrays.asList(this.environment.getActiveProfiles()).contains(Profiles.HSQLDB))
-            return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        else
-            return dateTime.toString();
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
 
