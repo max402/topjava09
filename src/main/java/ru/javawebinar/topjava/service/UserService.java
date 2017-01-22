@@ -1,9 +1,12 @@
 package ru.javawebinar.topjava.service;
 
 
+import javafx.print.Collation;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,4 +28,6 @@ public interface UserService {
     void update(User user);
     
     void evictCache();
+
+    Collection<Meal> getMealsByUserId(int id);
 }

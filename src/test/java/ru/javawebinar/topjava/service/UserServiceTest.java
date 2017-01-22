@@ -10,8 +10,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.BaseEntity;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -86,5 +88,11 @@ public abstract class UserServiceTest extends BaseServiceTest {
         updated.setCaloriesPerDay(330);
         service.update(updated);
         MATCHER.assertEquals(updated, service.get(USER_ID));
+    }
+
+    @Test
+    public void testGetMeals() throws Exception {
+        Collection<Meal> meals = service.getMealsByUserId(USER_ID);
+        //MATCHER.assertCollectionEquals(MealTestData.MEALS, meals);
     }
 }

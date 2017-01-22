@@ -42,6 +42,14 @@ public class User extends NamedEntity {
     @Length(min = 5)
     private String password;
 
+    public List<Meal> getMeals() {
+        return meals;
+    }
+
+    public void setMeals(List<Meal> meals) {
+        this.meals = meals;
+    }
+
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
