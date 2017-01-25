@@ -42,7 +42,7 @@ public class RootController {
     @Autowired
     private MealService mealService;
 
-    private static final Logger LOG = LoggerFactory.getLogger(MealServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RootController.class);
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String root() {
