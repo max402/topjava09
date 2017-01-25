@@ -3,7 +3,9 @@ package ru.javawebinar.topjava.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.JpaUtil;
@@ -21,13 +23,17 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
     protected UserService service;
 
-    @Autowired
+    @Autowired(required = false)
     protected JpaUtil jpaUtil;
+
+    @Autowired
+    private Environment environment;
 
     @Before
     public void setUp() throws Exception {
         service.evictCache();
-        jpaUtil.clear2ndLevelHibernateCache();
+        if(!Arrays.asList(environment.getActiveProfiles()).contains(Profiles.JDBC))
+            jpaUtil.clear2ndLevelHibernateCache();
     }
 
     @Test
