@@ -140,7 +140,9 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     }
 
     private User setRoles(User u) {
-        List<Role> roles = jdbcTemplate.query("SELECT role FROM user_roles WHERE user_id=?", (rs, rowNum) -> Role.valueOf(rs.getString("role")), u.getId());
+        if(u==null) return null;
+        List<Role> roles = jdbcTemplate.query("SELECT role FROM user_roles WHERE user_id=?",
+                (rs, rowNum) -> Role.valueOf(rs.getString("role")), u.getId());
         u.setRoles(roles);
         return u;
     }
