@@ -11,8 +11,11 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
+import static ru.javawebinar.topjava.util.ValidationUtil.checkIdConsistent;
 
 /**
  * GKislin
@@ -43,7 +46,7 @@ public abstract class AbstractMealController {
     }
 
     public void update(Meal meal, int id) {
-        meal.setId(id);
+        checkIdConsistent(meal, id);
         int userId = AuthorizedUser.id();
         LOG.info("update {} for User {}", meal, userId);
         service.update(meal, userId);
