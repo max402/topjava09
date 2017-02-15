@@ -1,4 +1,4 @@
-var ajaxUrl = 'ajax/admin/users/';
+var ajaxUrl = 'ajax/meals/';
 var datatableApi;
 
 // $(document).ready(function () {
@@ -8,19 +8,13 @@ $(function () {
         "info": true,
         "columns": [
             {
-                "data": "name"
+                "data": "dateTime"
             },
             {
-                "data": "email"
+                "data": "description"
             },
             {
-                "data": "roles"
-            },
-            {
-                "data": "enabled"
-            },
-            {
-                "data": "registered"
+                "data": "calories"
             },
             {
                 "defaultContent": "Edit",
@@ -39,18 +33,21 @@ $(function () {
         ]
     });
     makeEditable();
-    init();
 });
 
-function toggleUser(checkbox) {
-    var enabled = checkbox.is(":checked");
-    checkbox.parent().parent().css('text-decoration', enabled ? "none" : "line-through")
+function filter() {
+    var form = $('#filterForm');
     $.ajax({
         type: "POST",
-        url: ajaxUrl + checkbox.parent().parent().prop('id'),
-        data: 'enabled='+ enabled,
-        success: function () {
-            successNoty(enabled ? 'enabled' : 'disabled');
+        url: ajaxUrl + 'filter',
+        data: form.serialize(),
+        success: function (data) {
+            updateTableByData(data);
+            successNoty('Filtered');
         }
     });
+}
+
+function reset() {
+    $("#form")[0].reset();
 }

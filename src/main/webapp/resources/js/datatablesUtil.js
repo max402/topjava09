@@ -1,6 +1,6 @@
 function makeEditable() {
     $('.delete').click(function () {
-        deleteRow($(this).attr("id"));
+        deleteRow($(this).closest('tr').prop('id'));
     });
 
     $('#detailsForm').submit(function () {
@@ -11,6 +11,13 @@ function makeEditable() {
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
         failNoty(event, jqXHR, options, jsExc);
     });
+
+    $('#filterForm').submit(function () {
+        filter();
+        return false;
+    });
+
+
 }
 
 function add() {
@@ -29,13 +36,18 @@ function deleteRow(id) {
     });
 }
 
+function updateTableByData(data) {
+    datatableApi.clear();
+    $.each(data, function (key, item) {
+        datatableApi.row.add(item);
+    });
+    datatableApi.draw();
+}
+
 function updateTable() {
     $.get(ajaxUrl, function (data) {
-        datatableApi.clear();
-        $.each(data, function (key, item) {
-            datatableApi.row.add(item);
-        });
-        datatableApi.draw();
+        updateTableByData(data);
+        init();
     });
 }
 
@@ -79,4 +91,12 @@ function failNoty(event, jqXHR, options, jsExc) {
         type: 'error',
         layout: 'bottomRight'
     });
+}
+
+function init() {
+    $(":checkbox").each(function () {
+        if(!$(this).is(":checked")) {
+            $(this).parent().parent().css("text-decoration", "line-through");
+        }
+    })
 }
