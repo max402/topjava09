@@ -1,16 +1,22 @@
 package ru.javawebinar.topjava.web;
 
+import javassist.tools.web.BadHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.util.exception.ErrorInfo;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 
 /**
  * User: gkislin
@@ -37,6 +43,30 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, true);
     }
 
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY) // 422
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
+    public ErrorInfo handleErrorRest(HttpServletRequest req, MethodArgumentNotValidException e) {
+        return logAndGetValidationErrorInfo(req, e.getBindingResult());
+    }
+
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY) // 422
+    @ExceptionHandler(ValidationException.class)
+    @ResponseBody
+    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
+    public ErrorInfo handleErrorRest(HttpServletRequest req, ValidationException e) {
+        return logAndGetErrorInfo(req, e, true);
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST) // 400
+    @ExceptionHandler(ValidationException.class)
+    @ResponseBody
+    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
+    public ErrorInfo handleError(HttpServletRequest req, ValidationException e) {
+        return logAndGetErrorInfo(req, e, true);
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     @ResponseBody
@@ -53,4 +83,9 @@ public class ExceptionInfoHandler {
         }
         return new ErrorInfo(req.getRequestURL(), e);
     }
+
+    private ErrorInfo logAndGetValidationErrorInfo(HttpServletRequest req, BindingResult res) {
+        return null;
+    }
+
 }
