@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
+import java.util.Arrays;
 
 /**
  * User: gkislin
@@ -43,28 +45,36 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, true);
     }
 
-    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY) // 422
+//
+//@ResponseStatus(value = HttpStatus.BAD_REQUEST) // 400
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    @ResponseBody
+//    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
+//    public ErrorInfo handleErrorRest(HttpServletRequest req, MethodArgumentNotValidException e) {
+//        return logAndGetValidationErrorInfo(req, e.getBindingResult());
+//    }
+//
+//    @ResponseStatus(value = HttpStatus.BAD_REQUEST) // 400
+//    @ExceptionHandler(BindException.class)
+//    @ResponseBody
+//    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
+//    public ErrorInfo handleError(HttpServletRequest req, BindingResult result) {
+//        return logAndGetValidationErrorInfo(req, result);
+//    }
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler(BindException.class)
+    @ResponseBody
+    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
+    public ErrorInfo bindValidationError(HttpServletRequest req, BindingResult result) {
+        return logAndGetValidationErrorInfo(req, result);
+    }
+
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
-    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    public ErrorInfo handleErrorRest(HttpServletRequest req, MethodArgumentNotValidException e) {
+    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
+    public ErrorInfo restValidationError(HttpServletRequest req, MethodArgumentNotValidException e) {
         return logAndGetValidationErrorInfo(req, e.getBindingResult());
-    }
-
-    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY) // 422
-    @ExceptionHandler(ValidationException.class)
-    @ResponseBody
-    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    public ErrorInfo handleErrorRest(HttpServletRequest req, ValidationException e) {
-        return logAndGetErrorInfo(req, e, true);
-    }
-
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST) // 400
-    @ExceptionHandler(ValidationException.class)
-    @ResponseBody
-    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    public ErrorInfo handleError(HttpServletRequest req, ValidationException e) {
-        return logAndGetErrorInfo(req, e, true);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -84,8 +94,11 @@ public class ExceptionInfoHandler {
         return new ErrorInfo(req.getRequestURL(), e);
     }
 
-    private ErrorInfo logAndGetValidationErrorInfo(HttpServletRequest req, BindingResult res) {
-        return null;
+    private ErrorInfo logAndGetValidationErrorInfo(HttpServletRequest req, BindingResult result) {
+        String[] details = result.getFieldErrors().stream()
+                .map(fe -> fe.getField() + ' ' + fe.getDefaultMessage()).toArray(String[]::new);
+        LOG.warn("Validation exception at request " + req.getRequestURL() + ": " + Arrays.toString(details));
+        return new ErrorInfo(req.getRequestURL(), "ValidationException", details);
     }
 
 }
