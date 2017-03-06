@@ -58,7 +58,7 @@
 
             <property name="basenames">
                 <list>
-                    <value>messages/app</value>
+                    <value>config/messages/app</value>
                 </list>
             </property>
             <property name="fallbackToSystemLocale" value="false"/>
